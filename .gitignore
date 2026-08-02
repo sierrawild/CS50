@@ -1,0 +1,24 @@
+# ==========================================
+# 1. Large Files & Media
+# ==========================================
+# Ignore large zip archives, installers, videos, or raw audio assets
+*.zip
+*.tar.gz
+*.mp4
+*.mov
+*.db
+*.raw
+
+# ==========================================
+# 2. Python Environment & Cache
+# ==========================================
+# Python compiled bytecode and cache folders
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
