@@ -9,6 +9,7 @@ class Paddle:
         self.dy = 0
         self.screen_h = screen_heigh
         self.color = color
+        self.rect = (self.x, self.y, self.width, self.heigh)
         
     def update(self, dt):
         if self.dy < 0:
@@ -16,6 +17,7 @@ class Paddle:
         else:
             self.y = min(self.screen_h - self.heigh, self.y + self.dy * dt)
             
-    def render(self, surface):
         self.rect = (self.x, self.y, self.width, self.heigh)
+            
+    def render(self, surface):
         pygame.draw.rect(surface, self.color, self.rect)
