@@ -2,135 +2,182 @@ import pygame
 from paddle import Paddle
 from ball import Ball
 
-WIDTH = 1280
-HEIGHT = 720    
 
-multi = 3
+def main():
+    WIDTH = 1280
+    HEIGHT = 720    
 
-PADDLE_SPEED = 200 * multi
-PADDLE_WIDTH = 6 * multi
-PADDLE_HEIGHT = 30 * multi
+    multi = 3
 
-game_state = 'start'
+    PADDLE_SPEED = 200 * multi
+    PADDLE_WIDTH = 6 * multi
+    PADDLE_HEIGHT = 30 * multi
 
-dt = 0
-pygame.init()
+    game_state = 'start'
 
-pygame.mixer.init()
-point_sound = pygame.mixer.Sound('Love2d/Week_0/assets/point.wav')
-win_sound = pygame.mixer.Sound('Love2d/Week_0/assets/win.wav')
-win_sound_played = 0
+    dt = 0
+    pygame.init()
 
-screen = pygame.display.set_mode((WIDTH,HEIGHT))
-clock = pygame.time.Clock()
+    # sound
+    pygame.mixer.init()
+    point_sound = pygame.mixer.Sound('Love2d/Week_0/assets/point.wav')
+    win_sound = pygame.mixer.Sound('Love2d/Week_0/assets/win.wav')
+    music = pygame.mixer.music.load('Love2d/Week_0/assets/music.wav')
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play(-1)
+    win_sound_played = 0
 
+    screen = pygame.display.set_mode((WIDTH,HEIGHT))
+    clock = pygame.time.Clock()
 
-player_1 = Paddle(50,100, PADDLE_WIDTH, PADDLE_HEIGHT, 'white', HEIGHT)
-player_2 = Paddle(WIDTH-PADDLE_WIDTH-50,100, PADDLE_WIDTH, PADDLE_HEIGHT, 'white', HEIGHT)
-p1_score = 0
-p2_score = 0
-win_condition = 3
-ball = Ball(WIDTH/2, HEIGHT/2, 5, multi, HEIGHT)
+    # players
+    player_1 = Paddle(50,100, PADDLE_WIDTH, PADDLE_HEIGHT, 'white', HEIGHT)
+    player_2 = Paddle(WIDTH-PADDLE_WIDTH-50,100, PADDLE_WIDTH, PADDLE_HEIGHT, 'white', HEIGHT)
+    p1_score = 0
+    p2_score = 0
+    win_condition = 3
+    ball = Ball(WIDTH/2, HEIGHT/2, 5, multi, HEIGHT)
 
-font = pygame.font.Font('Love2d/Week_0/assets/ByteBounce.ttf', 46)
-info = font.render('Press ENTER to start', True, 'white')
-info_rect = info.get_rect(center=(WIDTH//2, HEIGHT * 0.4))
-
-
-running = True
-while running:
-    ### events ###
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                running = False
-            elif event.key == pygame.K_RETURN:
-                if game_state == 'start':
-                    game_state = 'play'
-                else:
-                    game_state = 'start'
-                    ball = Ball(WIDTH/2, HEIGHT/2, 5, multi, HEIGHT)
-                    p1_score = 0
-                    p2_score = 0
-                    win_sound_played = 0
-                
-    screen.fill((43,45,70))
+    game_mode = '2p'
     
+    # font
+    font = pygame.font.Font('Love2d/Week_0/assets/ByteBounce.ttf', 46)
+    info = font.render('Press ENTER to start', True, 'white')
+    info_rect = info.get_rect(center=(WIDTH//2, HEIGHT * 0.4))
+    
+    
+    ##### main loop #####
+    running = True
+    while running:
+        ### events ###
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+                elif event.key == pygame.K_x:
+                    if game_mode == '2p':
+                        game_mode = '1p'
+                    else:
+                        game_mode = '2p'
+
+                elif event.key == pygame.K_RETURN:
+                    if game_state == 'start':
+                        game_state = 'play'
+                    else:
+                        game_state = 'start'
+                        ball = Ball(WIDTH/2, HEIGHT/2, 5, multi, HEIGHT)
+                        p1_score = 0
+                        p2_score = 0
+                        win_sound_played = 0
+                        player_1.heigh = PADDLE_HEIGHT
+                        player_2.heigh = PADDLE_HEIGHT
+                    
+        screen.fill((43,45,70))
+        
+        key_input(PADDLE_SPEED, player_1, player_2, game_mode)
+        
+         
+
+        ### update ###
+        if game_mode == '1p':
+            player2_ai(player_2, ball, PADDLE_SPEED)
+        
+        player_1.update(dt)
+        player_2.update(dt)
+        
+        
+        # score text
+        score_surface = font.render(f'{p1_score} {" "*60} {p2_score}', True, 'white')
+        score_rect = score_surface.get_rect(center=(WIDTH//2, HEIGHT * 0.1))
+        screen.blit(score_surface, score_rect)
+        
+        # state
+        if game_state == 'play':
+            ball.update(dt)
+        if game_state == 'start':
+            screen.blit(info, info_rect)
+            game_mode_info = font.render(f'Game mode {game_mode}\nPress X to change', True, 'white')
+            game_mode_rect = game_mode_info.get_rect(center=(WIDTH * 0.7, HEIGHT * 0.8))
+            screen.blit(game_mode_info,game_mode_rect)
+        if p1_score >= win_condition or p2_score >= win_condition:
+            game_state = 'win'
+        if game_state == 'win':
+            ball = Ball(WIDTH/2, HEIGHT/2, 5, multi, HEIGHT)
+            if p1_score >= win_condition:
+                win = font.render('Player 1 win!!!', True, 'white')
+            else:
+                win = font.render('Player 2 win!!!', True, 'white')
+            win_rect = win.get_rect(center=(WIDTH//2, HEIGHT * 0.3))        
+            
+            screen.blit(win, win_rect)
+            screen.blit(info, info_rect)
+
+            win_sound_played += 1
+            if win_sound_played > 1 and win_sound_played < 4:
+                win_sound.play()
+        
+        # ball colliding with a paddle   
+        if ball.rect.colliderect(player_1.rect) or ball.rect.colliderect(player_2.rect):
+            ball.bounce()
+        
+        # scoring
+        if ball.x < 0:
+            player_1.heigh *= 1.2
+            p2_score +=1
+            ball = Ball(WIDTH/2, HEIGHT/2, 5, multi, HEIGHT)
+            ball.dy = 100 * multi
+            point_sound.play()
+        elif ball.x > WIDTH:
+            player_2.heigh *= 1.2
+            p1_score +=1
+            ball = Ball(WIDTH/2, HEIGHT/2, 5, multi, HEIGHT)
+            ball.dy = -100 * multi
+            point_sound.play()
+
+        ### render ###
+        
+        player_1.render(screen)
+        player_2.render(screen)
+        
+        ball.render(screen)
+        pygame.display.flip()
+        ###
+        dt = clock.tick(60) / 1000
+        
+    pygame.quit()
+
+def key_input(PADDLE_SPEED, player_1, player_2, game_mode):
     ### key input ###
     keys = pygame.key.get_pressed()
-    # p1           
+        # p1           
     if keys[pygame.K_w]:
         player_1.dy = -PADDLE_SPEED 
     elif keys[pygame.K_s]:
         player_1.dy =  PADDLE_SPEED
     else:
         player_1.dy = 0
-    #p2
-    if keys[pygame.K_UP]:
-        player_2.dy = -PADDLE_SPEED
-    elif keys[pygame.K_DOWN]:
-        player_2.dy = PADDLE_SPEED
-    else:
-        player_2.dy = 0
-        
-    ### update ###
-    player_1.update(dt)
-    player_2.update(dt)
-    
-    
-    # score text
-    score_surface = font.render(f'{p1_score} {" "*60} {p2_score}', True, 'white')
-    score_rect = score_surface.get_rect(center=(WIDTH//2, HEIGHT * 0.1))
-    screen.blit(score_surface, score_rect)
-    
-    # state
-    if game_state == 'play':
-        ball.update(dt)
-    if game_state == 'start':
-        screen.blit(info, info_rect)
-    if p1_score >= win_condition or p2_score >= win_condition:
-        game_state = 'win'
-    if game_state == 'win':
-        ball = Ball(WIDTH/2, HEIGHT/2, 5, multi, HEIGHT)
-        if p1_score >= win_condition:
-            win = font.render('Player 1 win!!!', True, 'white')
+        #p2
+    if game_mode == '2p':
+        if keys[pygame.K_UP]:
+            player_2.dy = -PADDLE_SPEED
+        elif keys[pygame.K_DOWN]:
+            player_2.dy = PADDLE_SPEED
         else:
-            win = font.render('Player 2 win!!!', True, 'white')
-        win_rect = win.get_rect(center=(WIDTH//2, HEIGHT * 0.3))        
-        
-        screen.blit(win, win_rect)
-        screen.blit(info, info_rect)
+            player_2.dy = 0
 
-        win_sound_played += 1
-        if win_sound_played > 1 and win_sound_played < 4:
-            win_sound.play()
+def player2_ai(player, ball, speed):
+    ball_y = ball.y
+    paddle_center = player.y + (player.heigh / 2)
     
-    # ball colliding with a paddle   
-    if ball.rect.colliderect(player_1.rect) or ball.rect.colliderect(player_2.rect):
-        ball.bounce()
+    if paddle_center > ball_y and paddle_center + (player.heigh / 2) > ball_y:
+        player.dy = -speed
+    elif paddle_center + (player.heigh / 2) < ball_y:
+        player.dy = speed
+    else:
+        player.dy = 0
     
-    # scoring
-    if ball.x < 0:
-        p2_score +=1
-        ball = Ball(WIDTH/2, HEIGHT/2, 5, multi, HEIGHT)
-        ball.dy = 100 * multi
-        point_sound.play()
-    elif ball.x > WIDTH:
-        p1_score +=1
-        ball = Ball(WIDTH/2, HEIGHT/2, 5, multi, HEIGHT)
-        ball.dy = -100 * multi
-        point_sound.play()
 
-    ### render ###
-    
-    player_1.render(screen)
-    player_2.render(screen)
-    
-    ball.render(screen)
-    pygame.display.flip()
-    ###
-    dt = clock.tick(60) / 1000
-    
-pygame.quit()
+if __name__ == '__main__':
+    main()
