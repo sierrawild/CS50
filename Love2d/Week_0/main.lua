@@ -4,33 +4,45 @@ WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
 VIRTUAL_WIDTH = 432
-VIRTUAL_HEIGHT = 242
+VIRTUAL_HEIGHT = 243
 
 PADDLE_SPEED = 200
 PADDLE_WIDTH = 10
 PADDLE_HEIGHT = 30
 
 push = require 'push'
-
+Class = require 'class'
+require 'Paddle'
+require 'Ball'
 
 function love.load()
     love.graphics.setDefaultFilter('nearest', 'nearest')
+    love.window.setTitle('My_Pong')
+    math.randomseed(os.time())
     
-    largeFont =  love.graphics.newFont('ByteBounce.ttf', 32)
-    smallFont =  love.graphics.newFont('ByteBounce.ttf', 16)
+    smallFont =  love.graphics.newFont('assets/ByteBounce.ttf', 8)
+    largeFont =  love.graphics.newFont('assets/ByteBounce.ttf', 32)
+    scoreFont =  love.graphics.newFont('assets/ByteBounce.ttf', 16)
     
+    sounds = {['hit1'] = love.audio.newSource('assets/hit1.wav'),
+    ['hit1'] = love.audio.newSource('assets/hit2.wav'),
+    ['win'] = love.audio.newSource('assets/win.wav'),
+    ['point'] = love.audio.newSource('assets/point.wav'),
+    }
+    music = love.audio.newSource('assets/music.wav')
+
     p1_score = 0
     p2_score = 0
     
     p1_y = 10
     p2_y = VIRTUAL_HEIGHT - 40
     
+
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         resizable = false,
         vsync = true,
         fullscreen = false})
         
-        math.randomseed(os.time())
 
         -- ball
         ball_size = 10
