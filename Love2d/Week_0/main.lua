@@ -24,35 +24,35 @@ function love.load()
     largeFont =  love.graphics.newFont('assets/ByteBounce.ttf', 32)
     scoreFont =  love.graphics.newFont('assets/ByteBounce.ttf', 16)
     
-    sounds = {['hit1'] = love.audio.newSource('assets/hit1.wav'),
-    ['hit1'] = love.audio.newSource('assets/hit2.wav'),
-    ['win'] = love.audio.newSource('assets/win.wav'),
-    ['point'] = love.audio.newSource('assets/point.wav'),
+    sounds = {
+    ['hit1'] = love.audio.newSource('assets/hit1.wav', 'static'),
+    ['hit2'] = love.audio.newSource('assets/hit2.wav', 'static'),
+    ['win'] = love.audio.newSource('assets/win.wav', 'static'),
+    ['point'] = love.audio.newSource('assets/point.wav', 'static')
     }
-    music = love.audio.newSource('assets/music.wav')
+    music = love.audio.newSource('assets/music.wav', 'static')
 
     p1_score = 0
     p2_score = 0
     
-    p1_y = 10
-    p2_y = VIRTUAL_HEIGHT - 40
+    p1 = Paddle(10,30, 5, 20)
+    p2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
+
+    ball = Ball(VIRTUAL_WIDTH / 2 - 2, VIRTUAL_HEIGHT / 2 -2, 4, 4)
+
+    serving_player = 1
+
+    winning_player = 0
     
 
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         resizable = false,
         vsync = true,
         fullscreen = false})
-        
+    
+    gameState = 'start'
 
-        -- ball
-        ball_size = 10
-        ballX = VIRTUAL_WIDTH / 2 - ball_size
-        ballY = VIRTUAL_HEIGHT / 2 - ball_size
-
-        ballDX = math.random(2) == 1 and 100 or - 100
-        ballDY = math.random(-50, 50)
         
-        gameState = 'start'
     end
     
     function love.keypressed(key)
@@ -74,34 +74,20 @@ function love.load()
 end
 
 function love.update(dt)
-    if love.keyboard.isDown('w') then
-        p1_y = p1_y + -PADDLE_SPEED * dt
-    elseif love.keyboard.isDown('s') then
-        p1_y = p1_y + PADDLE_SPEED * dt
+   if gameState == 'serve' then
+        ball.dy = math.random(-50,50)
+        if servingPlayer == 1 then
+            ball.dx = math.random(140, 200)
+        else
+            ball.dc = -math.random(140, 200)
+        end
+    elseif gameState == 'play' then
+        if ball:collides(p1) then
+            ball.dx = -ball.dx * 1.03
+            ball.x = p1.x + 5
+        end
     end
-
-    if love.keyboard.isDown('up') then
-        p2_y = p2_y + -PADDLE_SPEED * dt
-    elseif love.keyboard.isDown('down') then
-        p2_y = p2_y + PADDLE_SPEED * dt
-    end
-
-    -- clamp movement
-    if p1_y < 0 then
-        p1_y = 0
-    elseif p1_y > VIRTUAL_HEIGHT - PADDLE_HEIGHT then
-        p1_y = VIRTUAL_HEIGHT - PADDLE_HEIGHT
-    end
-    if p2_y < 0 then
-        p2_y = 0
-    elseif p2_y > VIRTUAL_HEIGHT - PADDLE_HEIGHT then
-        p2_y = VIRTUAL_HEIGHT - PADDLE_HEIGHT
-    end
-
-    if gameState == 'play' then
-        ballX = ballX + ballDX * dt
-        ballY = ballY + ballDY * dt
-    end
+   end 
 end
 
 function love.draw()
