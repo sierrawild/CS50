@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sources</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
+</head>
+<body>
+
+    <!-- Lua-style Header Banner -->
+    <header class="site-header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-symbol">&bull;</span> MySite
+            </div>
+            <p class="tagline">A simple, lightweight web project</p>
+        </div>
+    </header>
+
+    <!-- Main Container Layout -->
+    <div class="container">
+        <!-- Sidebar Nav -->
+        <nav class="sidebar">
+            <ul>
+                <li><a href="index.html" class="active">home</a></li>
+                <li><a href="about.html">about</a></li>
+                <li><a href="docs.html">docs</a></li>
+                <li><a href="contact.html">contact</a></li>
+            </ul>
+            
+            <button id="theme-toggle" class="btn-sm">Toggle Mode</button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            <h1>Welcome to My Site</h1>
+            <p class="lead">Designed in the spirit of simplicity, efficiency, and clarity.</p>
+
+            <hr>
+
+            <section>
+                <h2>About This Page</h2>
+                <p>
+                    This layout takes inspiration from classic technical portals. 
+                    It avoids unnecessary bloated framework styles and sticks to raw CSS grid/flexbox.
+                </p>
+                <ul>
+                    <li>Fast load times</li>
+                    <li>Clean, readable typography</li>
+                    <li>Responsive on mobile devices</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Quick Code Example</h2>
+                <pre><code>function greet(name)
+    return "Hello, " .. name .. "!"
+end
+
+print(greet("CS50"))</code></pre>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <p>Copyright &copy; 2026. Built for CS50x Week 8 Homepage.</p>
+    </footer>
+
+</body>
+</html>
