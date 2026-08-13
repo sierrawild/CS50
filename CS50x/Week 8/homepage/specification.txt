@@ -1,0 +1,23 @@
+10 HTML tags 
+5 CSS properties you’ve used 
+as well as a brief (one-sentence) description of how you chose to use JavaScript and Bootstrap.
+
+<HTML>
+
+<h1>
+<p>
+<a>
+<br>
+<img>
+<figure>
+<figcaption>
+
+CSS
+
+width
+overflow
+margin-left
+display
+grid-template-columns
+grid-template-rows
+gap
