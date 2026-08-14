@@ -1,3 +1,9 @@
+body {
+    background-color: whitesmoke;
+    text-align: center;
+}
+
+
 .crop{
     width: 33%;
     overflow: hidden;
@@ -5,7 +11,10 @@
 .crop img{
     width: 180%;
     margin-left: -40%;
-    /* margin-right: -25%; */
+}
+.side_by_side{
+    display: grid;
+    grid-template-columns: 30% 30% 30%;
 }
 
 .grid {
