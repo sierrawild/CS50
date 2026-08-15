@@ -5,12 +5,22 @@ as well as a brief (one-sentence) description of how you chose to use JavaScript
 <HTML>
 
 <h1>
+<h2>
 <p>
 <a>
 <br>
 <img>
 <figure>
 <figcaption>
+<div>
+<ul>
+<ol>
+<li>
+<table>
+<tr>
+<th>
+<td>
+<nav>
 
 CSS
 
@@ -21,3 +31,16 @@ display
 grid-template-columns
 grid-template-rows
 gap
+padding
+object-fit
+list-style
+float
+text-align
+text-decoration
+background-color
+
+Palette:
+Background   #f7f5f2
+Text   #1e1e2f
+Accent   #5b4b8a
+Soft accent   #a78bfa
