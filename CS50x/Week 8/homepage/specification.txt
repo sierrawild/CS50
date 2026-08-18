@@ -6,6 +6,8 @@ as well as a brief (one-sentence) description of how you chose to use JavaScript
 
 <h1>
 <h2>
+<h3>
+<h5>
 <p>
 <a>
 <br>

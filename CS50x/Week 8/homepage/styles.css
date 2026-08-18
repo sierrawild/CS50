@@ -8,7 +8,41 @@ body {
     padding: 40px 0;
 }
 
-
+#table{
+    text-align: left;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+th{
+    background-color: #5b4b8a;
+    border-style: solid;
+    border-width: 1em 0.5em;
+    padding: 10px 20px;
+    border-color: #f7f5f2;
+    border-radius: 1.5em;
+    
+}
+td{
+    background-color: #a78bfa;
+    border-style: solid;
+    border-width: 1em 0.5em;
+    padding: 10px 20px;
+    border-color: #f7f5f2;
+    border-radius: 1.5em;
+}
+p{
+    width: 60%;
+    text-align: center;
+}
+nav{
+    margin-top: 1em;
+    margin-bottom: 2em;
+}
+.center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .crop{
     width: 33%;
     overflow: hidden;
@@ -33,7 +67,7 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, auto);
-    gap: 1rem;
+    gap: 0.2rem;
 }
 
 /* Menu */
