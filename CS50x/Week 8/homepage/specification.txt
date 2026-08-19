@@ -1,9 +1,4 @@
-10 HTML tags 
-5 CSS properties you’ve used 
-as well as a brief (one-sentence) description of how you chose to use JavaScript and Bootstrap.
-
 <HTML>
-
 <h1>
 <h2>
 <h3>
@@ -25,7 +20,6 @@ as well as a brief (one-sentence) description of how you chose to use JavaScript
 <nav>
 
 CSS
-
 width
 overflow
 margin-left
@@ -46,3 +40,5 @@ Background   #f7f5f2
 Text   #1e1e2f
 Accent   #5b4b8a
 Soft accent   #a78bfa
+
+I used JavaScript to print the index page by clicking button and bootstrap accordion to hide example images on ratios page
