@@ -1,9 +1,13 @@
-from flask import Flask
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
 @app.route('/')
-def hello():
-    return '<strong>Hello, World!!!</strong>'
+def index():
+    if 'name' in request.args:
+        name = request.args['name']
+    else:
+        name = 'world!!!'
+    return render_template('index.html', placeholder=name)
 
 app.run(debug=True)
