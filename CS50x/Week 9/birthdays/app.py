@@ -11,6 +11,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///birthdays.db")
+# db = SQL(r"CS50x\Week 9\birthdays\birthdays.db")
 
 
 @app.after_request
@@ -26,14 +27,26 @@ def after_request(response):
 def index():
     if request.method == "POST":
 
-        # TODO: Add the user's entry into the database
+        # Done: Add the user's entry into the database
+        name = request.form.get('name')
+        if not name:
+            return redirect('/')
+        month = request.form.get('month')
+        if not month:
+            return redirect('/')
+        day = request.form.get('day')
+        if not day:
+            return redirect('/')
+
+        # insert data into database
+        db.execute('INSERT INTO BIRTHDAYS (name, month, day) VALUES(?, ?, ?)', name, month, day)
+        
 
         return redirect("/")
 
     else:
 
         # TODO: Display the entries in the database on index.html
+        bd = db.execute('SELECT * FROM birthdays')
 
-        return render_template("index.html")
-
-app.run(debug=True)
+        return render_template("index.html", birthdays=bd)
