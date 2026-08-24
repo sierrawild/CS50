@@ -124,11 +124,24 @@ def register():
         
         # validate inputs 
         if len(username) == 0:
-            return apology('Invalid username')
+            return apology('Invalid username', 400)
         elif len(password) == 0:
-            return apology('Invalid password')
+            return apology('Invalid password', 400)
         elif password != confirmation:
-            return apology("password don't match confirmation")
+            return apology("password don't match confirmation", 400)
+        
+        hash = generate_password_hash(password)
+        
+        # insert to database
+        try:
+            db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", username, hash)
+        except ValueError:
+            return apology("Username already taken")
+        
+        # get user if
+        rows = db.execute("SELECT id FROM users WHERE username = ?", username)
+        session['user_id'] = rows[0]['id']
+        return redirect("/")
 
 
 @app.route("/sell", methods=["GET", "POST"])
