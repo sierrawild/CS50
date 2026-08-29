@@ -42,7 +42,37 @@ def index():
 @login_required
 def buy():
     """Buy shares of stock"""
-    return apology("TODO")
+    if request.method == 'GET':
+        return render_template('buy.html')
+    else:
+        symbol = request.form.get('symbol')
+        shares = request.form.get('shares')
+        if not symbol:
+            return apology('Provide a symbol', 400)
+        stock = lookup(symbol)
+        if stock is None:
+            return apology('Invalid symbol', 400)
+        
+        # check if shares is a positive number
+        if not shares or not shares.isdigit() or int(shares) < 1:
+            return apology('Provide positive number', 400)
+        shares = int(shares)
+        
+        # get cash off the user
+        user_id = session['user_id']
+        row = db.execute("SELECT cash FROM users WHERE id = ?", user_id)
+        cash = row[0]['cash']
+        
+        cost = shares * stock['price']
+        if cost > cash:
+            return apology('Sorry, cant afford the purchase')
+        cash = cash - cost
+        # update cash in db
+        db.execute('UPDATE users Set cash = ? WHERE id = ?', cash, user_id)
+        # update transactions
+        db.execute('INSERT INTO transactions(user_id, symbol, shares, price) VALUES(?,?,?,?)', user_id, symbol, shares, stock["price"])
+        
+        return redirect('/')
 
 
 @app.route("/history")
@@ -149,10 +179,8 @@ def register():
         except ValueError:
             return apology("Username already taken")
         
-        # get user if
+        # get user cash
         rows = db.execute("SELECT id FROM users WHERE username = ?", username)
-        session['user_id'] = rows[0]['id']
-        return redirect("/")
 
 
 @app.route("/sell", methods=["GET", "POST"])
