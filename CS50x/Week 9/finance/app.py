@@ -35,7 +35,30 @@ def after_request(response):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    return apology("TODO")
+    user_id = session['user_id']
+    
+    rows = db.execute('SELECT symbol, SUM(shares) AS shares FROM transactions\
+        WHERE user_id = ? GROUP BY symbol HAVING SUM(shares) > 0', user_id)
+    
+    holdings = []
+    stocks_total = 0
+    
+    for row in rows:
+        stock = lookup(row['symbol'])
+        price = stock['price']
+        shares = row['shares']
+        total = shares * price
+        stocks_total += total
+        holdings.append({'symbol': row['symbol'],
+                         'shares': shares,
+                         'price': price,
+                         'total': total})
+    
+    cash = db.execute('SELECT cash FROM users WHERE id =?', user_id)
+    cash = cash[0]['cash']
+    grand_total = cash + stocks_total
+
+    return render_template('index.html', holdings=holdings, cash=cash, grand_total=grand_total)
 
 
 @app.route("/buy", methods=["GET", "POST"])
@@ -70,7 +93,7 @@ def buy():
         # update cash in db
         db.execute('UPDATE users Set cash = ? WHERE id = ?', cash, user_id)
         # update transactions
-        db.execute('INSERT INTO transactions(user_id, symbol, shares, price) VALUES(?,?,?,?)', user_id, symbol, shares, stock["price"])
+        db.execute('INSERT INTO transactions(user_id, symbol, shares, price) VALUES(?,?,?,?)', user_id, stock['symbol'], shares, stock["price"])
         
         return redirect('/')
 

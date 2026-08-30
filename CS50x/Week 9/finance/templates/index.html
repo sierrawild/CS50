@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Symbol</th>
+                <th>Shares</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for position in holdings %}
+            <tr>
+                <td>{{ position['symbol'] }}</td>
+                <td>{{ position['shares'] }}</td>
+                <td>{{ position['price'] | usd }}</td>
+                <td>{{ position['total'] | usd }}</td>
+            </tr>
+            {% endfor %}
+            
+            <tr>
+                <td></td>
+                <td></td>
+                <td>Cash:</td>
+                <td>{{ cash | usd }}</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>Grand total:</td>
+                <td>{{ grand_total | usd }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+{% endblock %}
