@@ -178,36 +178,91 @@ def register():
     """Register user"""
     session.clear()
     
-    if request.method == 'GET':
-        return render_template('register.html')
-    
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        confirmation = request.form.get('confirmation')
-        
-        # validate inputs 
-        if len(username) == 0:
-            return apology('Invalid username', 400)
-        elif len(password) == 0:
-            return apology('Invalid password', 400)
-        elif password != confirmation:
-            return apology("password don't match confirmation", 400)
-        
-        hash = generate_password_hash(password)
-        
-        # insert to database
-        try:
-            db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", username, hash)
-        except ValueError:
-            return apology("Username already taken")
-        
-        # get user cash
-        rows = db.execute("SELECT id FROM users WHERE username = ?", username)
+    if request.method == "GET":
+        return render_template("register.html")
+
+    username = request.form.get("username")
+    password = request.form.get("password")
+    confirmation = request.form.get("confirmation")
+
+    if not username:
+        return apology("must provide username", 400)
+    if not password:
+        return apology("must provide password", 400)
+    if not confirmation:
+        return apology("must confirm password", 400)
+    if password != confirmation:
+        return apology("passwords do not match", 400)
+
+    hash = generate_password_hash(password)
+
+    try:
+        db.execute(
+            "INSERT INTO users (username, hash) VALUES (?, ?)",
+            username, hash
+        )
+    except ValueError:
+        return apology("username already taken", 400)
+
+    rows = db.execute("SELECT id FROM users WHERE username = ?", username)
+    session["user_id"] = rows[0]["id"]
+    return redirect("/")
 
 
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
 def sell():
     """Sell shares of stock"""
-    return apology("TODO")
+    user_id = session["user_id"]
+
+    if request.method == "GET":
+        rows = db.execute(
+            "SELECT symbol FROM transactions WHERE user_id = ? GROUP BY symbol HAVING SUM(shares) > 0",
+            user_id
+        )
+        symbols = [row["symbol"] for row in rows]
+        return render_template("sell.html", symbols=symbols)
+
+    # POST
+    symbol = request.form.get("symbol")
+    shares = request.form.get("shares")
+
+    if not symbol:
+        return apology("must select a symbol", 400)
+
+    if not shares or not shares.isdigit() or int(shares) < 1:
+        return apology("shares must be a positive integer", 400)
+
+    shares = int(shares)
+
+    # How many do they own?
+    rows = db.execute(
+        "SELECT SUM(shares) AS shares FROM transactions WHERE user_id = ? AND symbol = ?",
+        user_id, symbol
+    )
+    owned = rows[0]["shares"] or 0
+
+    if owned < shares:
+        return apology("not enough shares", 400)
+
+    # Current price
+    stock = lookup(symbol)
+    if stock is None:
+        return apology("invalid symbol", 400)
+
+    price = stock["price"]
+    proceeds = shares * price
+
+    # Add cash
+    db.execute(
+        "UPDATE users SET cash = cash + ? WHERE id = ?",
+        proceeds, user_id
+    )
+
+    # Record sale (negative shares)
+    db.execute(
+        "INSERT INTO transactions (user_id, symbol, shares, price) VALUES (?, ?, ?, ?)",
+        user_id, symbol, -shares, price
+    )
+
+    return redirect("/")
