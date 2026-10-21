@@ -102,7 +102,12 @@ def buy():
 @login_required
 def history():
     """Show history of transactions"""
-    return apology("TODO")
+    user_id = session["user_id"]
+    rows = db.execute(
+        "SELECT symbol, shares, price, timestamp FROM transactions WHERE user_id = ? ORDER BY timestamp DESC",
+        user_id
+    )
+    return render_template("history.html", transactions=rows)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -263,6 +268,31 @@ def sell():
     db.execute(
         "INSERT INTO transactions (user_id, symbol, shares, price) VALUES (?, ?, ?, ?)",
         user_id, symbol, -shares, price
+    )
+
+    return redirect("/")
+
+@app.route("/add_cash", methods=["GET", "POST"])
+@login_required
+def add_cash():
+    """Add cash to account"""
+    if request.method == "GET":
+        return render_template("add_cash.html")
+
+    amount = request.form.get("amount")
+
+    # Must be a positive number
+    try:
+        amount = float(amount)
+        if amount <= 0:
+            return apology("amount must be positive", 400)
+    except (TypeError, ValueError):
+        return apology("must provide a valid amount", 400)
+
+    user_id = session["user_id"]
+    db.execute(
+        "UPDATE users SET cash = cash + ? WHERE id = ?",
+        amount, user_id
     )
 
     return redirect("/")
